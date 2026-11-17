@@ -64,6 +64,9 @@ public class GUI {
 
         floorScreen1.add(exitButton, position);
 
+        position.insets = new Insets(0, 0, 0, 0);
+        floorScreen1.drawPlayer(position);
+
         ActionListener click2 = new ActionListener() {
 
             @Override
