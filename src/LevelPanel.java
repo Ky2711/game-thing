@@ -15,6 +15,7 @@ import javax.swing.KeyStroke;
 public class LevelPanel extends JPanel {
 
     private JLabel wizardChar;
+    private Ellipse2D.Double oval = new Ellipse2D.Double(100, 200, 300, 200);
 
     public LevelPanel(GridBagLayout layout) { // fixes how it wasn't letting me use layout for this because its a custom panel
         super(layout);
@@ -30,7 +31,6 @@ public class LevelPanel extends JPanel {
     public void drawTowerFloor(Graphics g) {
 
         Graphics2D g2d = (Graphics2D) g;
-        Ellipse2D.Double oval = new Ellipse2D.Double(100, 200, 300, 200);
 
         g2d.setColor(Color.GRAY);
         g2d.fill(oval);
@@ -43,7 +43,7 @@ public class LevelPanel extends JPanel {
 
     public void drawPlayer(GridBagConstraints position) {
 
-        ImageIcon icon = new ImageIcon("images/idle_2.png");
+        ImageIcon icon = new ImageIcon("src/images/Idle_2.png");
         Image wizard = icon.getImage();
         Image scaledImage = wizard.getScaledInstance(50, 50, Image.SCALE_SMOOTH);
         ImageIcon smallWizard = new ImageIcon(scaledImage);
@@ -66,7 +66,12 @@ public class LevelPanel extends JPanel {
 
         getActionMap().put("moveRight", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                wizardChar.setLocation(wizardChar.getX() + 7, wizardChar.getY());
+               int newX = wizardChar.getX() + 7;
+               int newY = wizardChar.getY();
+
+               if (canMoveTo(newX, newY)) {
+                   wizardChar.setLocation(newX, newY);
+               }
             }
         });
 
@@ -74,7 +79,12 @@ public class LevelPanel extends JPanel {
 
         getActionMap().put("moveLeft", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                wizardChar.setLocation(wizardChar.getX() - 7, wizardChar.getY());
+                int newX = wizardChar.getX() - 7;
+                int newY = wizardChar.getY();
+
+                if (canMoveTo(newX, newY)) {
+                    wizardChar.setLocation(newX, newY);
+                }
             }
         });
 
@@ -82,7 +92,12 @@ public class LevelPanel extends JPanel {
 
         getActionMap().put("moveUp", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                wizardChar.setLocation(wizardChar.getX(), wizardChar.getY() - 7);
+                int newX = wizardChar.getX();
+                int newY = wizardChar.getY() - 7;
+
+                if (canMoveTo(newX, newY)) {
+                    wizardChar.setLocation(newX, newY);
+                }
             }
         });
 
@@ -90,9 +105,22 @@ public class LevelPanel extends JPanel {
 
         getActionMap().put("moveDown", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                wizardChar.setLocation(wizardChar.getX(), wizardChar.getY() + 7);
+                int newX = wizardChar.getX();
+                int newY = wizardChar.getY() + 7;
+
+                if (canMoveTo(newX, newY)) {
+                    wizardChar.setLocation(newX, newY);
+                }
             }
         });
+    }
 
+    private boolean canMoveTo(int newX, int newY) {
+        int hitboxWidth = 20;
+        int hitboxHeight = 30;
+
+        int hitboxX = newX + 15;
+        int hitboxY = newY + 10;
+        return oval.contains(hitboxX, hitboxY, hitboxWidth, hitboxHeight);
     }
 }
