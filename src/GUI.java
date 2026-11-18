@@ -1,66 +1,91 @@
-import javax.swing.*;
-import java.awt.*;
+import java.awt.CardLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
 
+public class GUI {
 
-public class GUI extends JPanel {
+    public void launch() {
 
-    public GUI() {
+        JFrame frame = new JFrame("Wizard Tower Game");
 
-        setLayout(null);
+        frame.setSize(500, 500);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // so you don't have to manually exit every time
 
-        ImageIcon icon = new ImageIcon("src/images/idle_2.png");
-        Image wizard = icon.getImage();
-        Image scaledImage = wizard.getScaledInstance(50, 50, Image.SCALE_SMOOTH);
-        ImageIcon smallWizard = new ImageIcon(scaledImage);
-        JLabel wizardChar = new JLabel(smallWizard);
-        wizardChar.setBounds(100, 100, 50, 50);
+        // referenced https://www.geeksforgeeks.org/java/java-awt-cardlayout-class/
 
-        getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("RIGHT"), "moveRight");
+        CardLayout cardLayout = new CardLayout();
+        JPanel cardPanel = new JPanel(cardLayout); // in using cardLayout, cardPanel holds all the different panels / "screens"
+                                                    // that represent different rooms.
 
-        getActionMap().put("moveRight", new AbstractAction() {
+        JPanel startScreen = new JPanel(new GridBagLayout()); // needs a layout so it
+        LevelPanel floorScreen1 = new LevelPanel(new GridBagLayout()); // won't just ignore setBounds()
+        // GridBagLayout (+constraints) is one that is pretty simple to use because you just have to change the insets
+        // or x and y position for restraints for each object you draw and attach those constraints as an argument
+        // also I had to make a custom class that extends JPanel for levels to draw to the panel instead of the screen
+        // so it would display properly lol
+
+        cardPanel.add(startScreen, "StartScreen");
+        cardPanel.add(floorScreen1, "Floor1");
+
+        GridBagConstraints position = new GridBagConstraints();
+
+        // Start Screen Setup
+
+        JButton startButton = new JButton("Start");
+        position.gridx = 0;
+        position.gridy = 0;
+        startScreen.add(startButton, position);
+
+        ActionListener click = new ActionListener() {
+
+            @Override
             public void actionPerformed(ActionEvent e) {
-                wizardChar.setLocation(wizardChar.getX() + 7, wizardChar.getY());
+                cardLayout.show(cardPanel, "Floor1");
+                cardPanel.revalidate(); // makes sure elements are laid out correctly with GridBagLayout
+                cardPanel.repaint(); // redraws elements
             }
-        });
 
-        getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("LEFT"), "moveLeft");
+        };
 
-        getActionMap().put("moveLeft", new AbstractAction() {
+        startButton.addActionListener(click);
+
+        // Floor 1 Screen Setup
+        // TODO add NPC player elements + temp projectile element to floorScreen1
+        // referenced https://mkyong.com/swing/java-swing-draw-shapes-dynamically-example/
+
+        JButton exitButton = new JButton("Exit to Menu");
+        position.insets = new Insets(0, 0, 400, 0);
+
+        floorScreen1.add(exitButton, position);
+
+        position.insets = new Insets(0, 0, 0, 0);
+        floorScreen1.drawPlayer(position);
+
+        ActionListener click2 = new ActionListener() {
+
+            @Override
             public void actionPerformed(ActionEvent e) {
-                wizardChar.setLocation(wizardChar.getX() - 7, wizardChar.getY());
+                cardLayout.show(cardPanel, "StartScreen");
+                cardPanel.revalidate();
+                cardPanel.repaint();
             }
-        });
+            
+        };
 
-        getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("UP"), "moveUp");
+        exitButton.addActionListener(click2);
 
-        getActionMap().put("moveUp", new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                wizardChar.setLocation(wizardChar.getX(), wizardChar.getY() - 7);
-            }
-        });
+        frame.add(cardPanel);
 
-        getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("DOWN"), "moveDown");
-
-        getActionMap().put("moveDown", new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                wizardChar.setLocation(wizardChar.getX(), wizardChar.getY() + 7);
-            }
-        });
-
-        add(wizardChar);
-
-    }
-
-    public static void main(String[] args) {
-        JFrame frame = new JFrame("Wizard Tower");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        GUI panel = new GUI();
-        frame.getContentPane().add(panel);
-
-
-        frame.setSize(800, 800);
         frame.setVisible(true);
-    }
-}
 
+        cardLayout.show(cardPanel, "StartScreen");
+        
+    }
+    
+}
