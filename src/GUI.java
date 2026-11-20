@@ -76,10 +76,17 @@ public class GUI {
 
         exitButton.addActionListener(click2);
 
-        position.insets = new Insets(0, 0, 0, 0);
-        floorScreen1.drawPlayer(position);
-        position.insets = new Insets(150, 150, 0, 0);
-        floorScreen1.drawNPCPlayer(position);
+        GridBagConstraints playerPosition = new GridBagConstraints();
+        playerPosition.gridx = 0;
+        playerPosition.gridy = 0;
+        playerPosition.anchor = GridBagConstraints.CENTER;
+        floorScreen1.drawPlayer(playerPosition);
+
+        GridBagConstraints npcPosition = new GridBagConstraints();
+        npcPosition.gridx = 1;
+        npcPosition.gridy = 0;
+        npcPosition.anchor = GridBagConstraints.CENTER;
+        floorScreen1.drawNPCPlayer(npcPosition);
 
         frame.add(cardPanel);
 
