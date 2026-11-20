@@ -35,12 +35,7 @@ public class Player extends GameObj {
     }
 
     public Projectile shoot() {
-        return new Projectile(
-                getPositionX(),
-                getPositionY(),
-                10,
-                10
-        );
+        return new Projectile(getPositionX(), getPositionY(), 10, 10, this);
     }
 
     public void hit() {
