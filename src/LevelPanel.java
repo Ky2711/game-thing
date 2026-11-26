@@ -6,17 +6,18 @@ import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.geom.Ellipse2D;
-import javax.swing.AbstractAction;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.KeyStroke;
+import javax.swing.*;
 
 public class LevelPanel extends JPanel {
 
     private JLabel wizardChar;
     private JLabel npcChar;
     private Ellipse2D.Double oval;
+    private boolean moveRight;
+    private boolean moveLeft;
+    private boolean moveUp;
+    private boolean moveDown;
+    private Timer movementTimer;
 
     public LevelPanel(GridBagLayout layout) {
         super(layout);
@@ -66,7 +67,6 @@ public class LevelPanel extends JPanel {
         add(wizardChar, position);
 
         setUpControls();
-
     }
 
     public void drawProjectile(Graphics g) {
@@ -75,60 +75,111 @@ public class LevelPanel extends JPanel {
 
     public void setUpControls() {
 
-        getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("RIGHT"), "moveRight");
+        getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("pressed RIGHT"), "rightPressed");
 
-        getActionMap().put("moveRight", new AbstractAction() {
+        getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("released RIGHT"), "rightReleased");
+
+        getActionMap().put("rightPressed", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-               int newX = wizardChar.getX() + 7;
-               int newY = wizardChar.getY();
-
-               if (canMoveTo(newX, newY)) {
-                   wizardChar.setLocation(newX, newY);
-               }
+                moveRight = true;
             }
         });
 
-        getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("LEFT"), "moveLeft");
-
-        getActionMap().put("moveLeft", new AbstractAction() {
+        getActionMap().put("rightReleased", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                int newX = wizardChar.getX() - 7;
-                int newY = wizardChar.getY();
-
-                if (canMoveTo(newX, newY)) {
-                    wizardChar.setLocation(newX, newY);
-                }
+                moveRight = false;
             }
         });
 
-        getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("UP"), "moveUp");
+        getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("pressed LEFT"), "leftPressed");
 
-        getActionMap().put("moveUp", new AbstractAction() {
+        getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("released LEFT"), "leftReleased");
+
+        getActionMap().put("leftPressed", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                int newX = wizardChar.getX();
-                int newY = wizardChar.getY() - 7;
-
-                if (canMoveTo(newX, newY)) {
-                    wizardChar.setLocation(newX, newY);
-                }
+                moveLeft = true;
             }
         });
 
-        getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("DOWN"), "moveDown");
-
-        getActionMap().put("moveDown", new AbstractAction() {
+        getActionMap().put("leftReleased", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                int newX = wizardChar.getX();
-                int newY = wizardChar.getY() + 7;
-
-                if (canMoveTo(newX, newY)) {
-                    wizardChar.setLocation(newX, newY);
-                }
+                moveLeft = false;
             }
         });
+
+        getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("pressed UP"), "upPressed");
+
+        getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("released UP"), "upReleased");
+
+        getActionMap().put("upPressed", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                moveUp = true;
+            }
+        });
+
+        getActionMap().put("upReleased", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                moveUp = false;
+            }
+        });
+
+        getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("pressed DOWN"), "downPressed");
+
+        getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("released DOWN"), "downReleased");
+
+        getActionMap().put("downPressed", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                moveDown = true;
+            }
+        });
+
+        getActionMap().put("downReleased", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                moveDown = false;
+            }
+        });
+
+        getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("SPACE"), "shoot");
+
+        getActionMap().put("shoot", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                shootProjectile();
+            }
+        });
+
+        movementTimer = new Timer(50, e -> {
+            int newX = wizardChar.getX();
+            int newY = wizardChar.getY();
+
+            if (moveRight) {
+                newX += 7;
+            }
+
+            if (moveLeft) {
+                newX -= 7;
+            }
+
+            if (moveUp) {
+                newY -= 7;
+            }
+
+            if (moveDown) {
+                newY += 7;
+            }
+
+            if (canMoveTo(newX, newY)) {
+                wizardChar.setLocation(newX, newY);
+            }
+        });
+
+        movementTimer.start();
     }
 
     private boolean canMoveTo(int newX, int newY) {
+        if (oval == null) {
+            return false;
+        }
+
         int hitboxWidth = 20;
         int hitboxHeight = 30;
 
@@ -136,4 +187,27 @@ public class LevelPanel extends JPanel {
         int hitboxY = newY + 10;
         return oval.contains(hitboxX, hitboxY, hitboxWidth, hitboxHeight);
     }
+
+    private void shootProjectile() {
+        JLabel projectile = new JLabel();
+
+        projectile.setOpaque(true);
+        projectile.setBackground(Color.RED);
+        projectile.setSize(5, 5);
+
+        int startx = wizardChar.getX() + wizardChar.getWidth();
+        int starty = wizardChar.getY() + wizardChar.getHeight() / 2;
+
+        projectile.setLocation(startx, starty);
+
+        add(projectile);
+        repaint();
+
+        Timer projectileTimer = new Timer(20, e -> {
+            projectile.setLocation(projectile.getX() + 5, projectile.getY());
+        });
+
+        projectileTimer.start();
+    }
+
 }
