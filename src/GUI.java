@@ -10,7 +10,7 @@ import javax.swing.JPanel;
 
 public class GUI {
 
-    public void launch() {
+    public GUI() {
 
         JFrame frame = new JFrame("Wizard Tower Game");
 
@@ -61,11 +61,7 @@ public class GUI {
 
         JButton exitButton = new JButton("Exit to Menu");
         position.insets = new Insets(0, 0, 400, 0);
-
         floorScreen1.add(exitButton, position);
-
-        position.insets = new Insets(0, 0, 0, 0);
-        floorScreen1.drawPlayer(position);
 
         ActionListener click2 = new ActionListener() {
 
@@ -79,6 +75,18 @@ public class GUI {
         };
 
         exitButton.addActionListener(click2);
+
+        GridBagConstraints playerPosition = new GridBagConstraints();
+        playerPosition.gridx = 0;
+        playerPosition.gridy = 0;
+        playerPosition.anchor = GridBagConstraints.CENTER;
+        floorScreen1.drawPlayer(playerPosition);
+
+        GridBagConstraints npcPosition = new GridBagConstraints();
+        npcPosition.gridx = 1;
+        npcPosition.gridy = 0;
+        npcPosition.anchor = GridBagConstraints.CENTER;
+        floorScreen1.drawNPCPlayer(npcPosition);
 
         frame.add(cardPanel);
 

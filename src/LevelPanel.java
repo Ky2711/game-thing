@@ -15,9 +15,10 @@ import javax.swing.KeyStroke;
 public class LevelPanel extends JPanel {
 
     private JLabel wizardChar;
-    private Ellipse2D.Double oval = new Ellipse2D.Double(100, 200, 300, 200);
+    private JLabel npcChar;
+    private Ellipse2D.Double oval;
 
-    public LevelPanel(GridBagLayout layout) { // fixes how it wasn't letting me use layout for this because its a custom panel
+    public LevelPanel(GridBagLayout layout) {
         super(layout);
     }
 
@@ -25,30 +26,42 @@ public class LevelPanel extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        drawTowerFloor(g);
+        int x = (this.getWidth() - 300) / 2;
+        int y = (this.getHeight() - 200) / 2;
+
+        drawTowerFloor(g, x, y);
     }
 
-    public void drawTowerFloor(Graphics g) {
+    public void drawTowerFloor(Graphics g, int x, int y) {
 
         Graphics2D g2d = (Graphics2D) g;
+        this.oval = new Ellipse2D.Double(x, y, 300, 200);
 
         g2d.setColor(Color.GRAY);
         g2d.fill(oval);
-        
+
     }
 
-    public void drawNPCPlayer(Graphics g) {
-        // TODO
+    public void drawNPCPlayer(GridBagConstraints position) {
+
+        ImageIcon icon = new ImageIcon(getClass().getResource("/images/Wizard.png"));
+        // Getting the image this way prevents the debugger from not being able to find it...
+        Image wizard = icon.getImage();
+        Image scaledImage = wizard.getScaledInstance(25, 25, Image.SCALE_SMOOTH);
+        ImageIcon smallWizard = new ImageIcon(scaledImage);
+        this.npcChar = new JLabel(smallWizard);
+
+        add(npcChar, position);
+
     }
 
     public void drawPlayer(GridBagConstraints position) {
 
-        ImageIcon icon = new ImageIcon("src/images/Idle_2.png");
+        ImageIcon icon = new ImageIcon(getClass().getResource("/images/Idle_2.png"));
         Image wizard = icon.getImage();
-        Image scaledImage = wizard.getScaledInstance(50, 50, Image.SCALE_SMOOTH);
+        Image scaledImage = wizard.getScaledInstance(25, 25, Image.SCALE_SMOOTH);
         ImageIcon smallWizard = new ImageIcon(scaledImage);
         this.wizardChar = new JLabel(smallWizard);
-        wizardChar.setBounds(100, 100, 50, 50);
 
         add(wizardChar, position);
 

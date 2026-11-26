@@ -23,4 +23,3 @@ public class Projectile extends GameObj {
         return active;
     }
 }
-
